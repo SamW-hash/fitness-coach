@@ -2,8 +2,8 @@ from fastapi import FastAPI, Depends
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from .schemas import MeasurementCreate, MeasurementRead
-from .db.models import Measurement
+from .schemas import BodyMeasurementCreate, BodyMeasurementRead
+from .db.models import BodyMeasurement
 from .db.session import get_db
 
 app = FastAPI(title="Fitness Coach API")
@@ -16,15 +16,15 @@ def health_check():
 def home():
     return {"message": "Fitness Coach API"}
 
-@app.get("/measurements", response_model=list[MeasurementRead])
+@app.get("/body-measurements", response_model=list[BodyMeasurementRead])
 def get_measurements(db: Session = Depends(get_db)):
-    statement = select(Measurement)
+    statement = select(BodyMeasurement)
     result = db.execute(statement)
     return result.scalars().all()
 
-@app.post("/measurements", response_model=MeasurementRead)
-def create_measurement(measurement: MeasurementCreate, db: Session = Depends(get_db)):
-    record = Measurement(**measurement.model_dump())
+@app.post("/body-measurements", response_model=BodyMeasurementRead)
+def create_measurement(measurement: BodyMeasurementCreate, db: Session = Depends(get_db)):
+    record = BodyMeasurement(**measurement.model_dump())
     db.add(record)
     db.commit()
     db.refresh(record)
